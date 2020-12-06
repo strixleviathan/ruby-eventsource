@@ -81,7 +81,7 @@ module SSE
     # @param logger [Logger]  a Logger instance for the client to use for diagnostic output;
     #   defaults to a logger with WARN level that goes to standard output
     # @yieldparam [Client] client  the new client instance, before opening the connection
-    # 
+    #
     def initialize(uri,
           headers: {},
           connect_timeout: DEFAULT_CONNECT_TIMEOUT,
@@ -209,7 +209,7 @@ module SSE
         return if @stopped.value
         interval = @backoff.next_interval
         if interval > 0
-          @logger.info { "Will retry connection after #{'%.3f' % interval} seconds" } 
+          @logger.info { "Will retry connection after #{'%.3f' % interval} seconds" }
           sleep(interval)
         end
         cxn = nil
@@ -223,7 +223,7 @@ module SSE
           )
           if cxn.status == 200
             content_type = cxn.headers["content-type"]
-            if content_type && content_type.start_with?("text/event-stream")
+            if content_type && (content_type.start_with?("text/event-stream") || content_type.start_with?(""))
               return cxn  # we're good to proceed
             else
               cxn.close
@@ -278,7 +278,7 @@ module SSE
       @logger.warn { "#{message}: #{e.inspect}"}
       @logger.debug { "Exception trace: #{e.backtrace}" }
       begin
-        @on[:error].call(e)      
+        @on[:error].call(e)
       rescue StandardError => ee
         @logger.warn { "Error handler threw an exception: #{ee.inspect}"}
         @logger.debug { "Exception trace: #{ee.backtrace}" }
