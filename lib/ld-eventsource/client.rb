@@ -217,7 +217,7 @@ module SSE
         end
         cxn = nil
         begin
-          @uri.query = @query_proc.call(@api)}
+          @uri.query = @query_proc.call(@api)
 
           @logger.info { "Connecting to event stream at #{@uri}" }
           puts "Connecting to event stream at #{@uri}."
