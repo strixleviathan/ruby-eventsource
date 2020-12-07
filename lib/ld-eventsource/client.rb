@@ -222,12 +222,14 @@ module SSE
             read_timeout: @read_timeout
           )
           if cxn.status == 200
+            puts  "Server successfully connect"
             @logger.info { "Server successfully connect" }
 
             return cxn # Bypass header checks
           else
             body = cxn.read_all  # grab the whole response body in case it has error details
             cxn.close
+            puts "Server returned error status #{cxn.status} / #{body}"
             @logger.info { "Server returned error status #{cxn.status} / #{body}" }
             err = Errors::HTTPStatusError.new(cxn.status, body)
             @on[:error].call(err)
