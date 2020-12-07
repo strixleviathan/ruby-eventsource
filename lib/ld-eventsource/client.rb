@@ -223,6 +223,9 @@ module SSE
           )
           if cxn.status == 200
             content_type = cxn.headers["content-type"]
+
+            Rails.logger.info("Debug Content Type: #{content_type}")
+
             if content_type && (content_type.start_with?("text/event-stream") || content_type.start_with?(""))
               return cxn  # we're good to proceed
             else
