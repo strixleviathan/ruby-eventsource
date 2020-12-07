@@ -83,6 +83,8 @@ module SSE
     # @yieldparam [Client] client  the new client instance, before opening the connection
     #
     def initialize(uri,
+          query_proc:,
+          api:,
           headers: {},
           connect_timeout: DEFAULT_CONNECT_TIMEOUT,
           read_timeout: DEFAULT_READ_TIMEOUT,
@@ -98,6 +100,8 @@ module SSE
       @connect_timeout = connect_timeout
       @read_timeout = read_timeout
       @logger = logger || default_logger
+      @query_proc = query_proc
+      @api = api
 
       if proxy
         @proxy = proxy
@@ -108,8 +112,7 @@ module SSE
         end
       end
 
-      @backoff = Impl::Backoff.new(reconnect_time || DEFAULT_RECONNECT_TIME, MAX_RECONNECT_TIME,
-        reconnect_reset_interval: reconnect_reset_interval)
+      @backoff = Impl::Backoff.new(reconnect_time || DEFAULT_RECONNECT_TIME, MAX_RECONNECT_TIME, reconnect_reset_interval: reconnect_reset_interval)
 
       @on = { event: ->(_) {}, error: ->(_) {} }
       @last_id = last_event_id
@@ -214,8 +217,12 @@ module SSE
         end
         cxn = nil
         begin
-          @logger.info { "Connecting to event stream at #{@uri}" }
-          cxn = Impl::StreamingHTTPConnection.new(@uri,
+          uri_with_query = @uri + @query_proc.call(@api)
+
+          @logger.info { "Connecting to event stream at #{uri_with_query}" }
+          puts "Connecting to event stream at #{uri_with_query}"
+
+          cxn = Impl::StreamingHTTPConnection.new(uri_with_query,
             proxy: @proxy,
             headers: build_headers,
             connect_timeout: @connect_timeout,
