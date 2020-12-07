@@ -217,12 +217,12 @@ module SSE
         end
         cxn = nil
         begin
-          uri_with_query = "#{@uri}?#{@query_proc.call(@api)}"
+          @uri.query = @query_proc.call(@api)}
 
-          @logger.info { "Connecting to event stream at #{uri_with_query}" }
-          puts "Connecting to event stream at #{uri_with_query}. Original @uri: #{@uri}"
+          @logger.info { "Connecting to event stream at #{@uri}" }
+          puts "Connecting to event stream at #{@uri}."
 
-          cxn = Impl::StreamingHTTPConnection.new(uri_with_query,
+          cxn = Impl::StreamingHTTPConnection.new(@uri,
             proxy: @proxy,
             headers: build_headers,
             connect_timeout: @connect_timeout,
