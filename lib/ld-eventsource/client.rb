@@ -258,6 +258,9 @@ module SSE
 
       event_parser = Impl::EventParser.new(cxn.read_lines)
       event_parser.items.each do |item|
+
+        puts item
+
         return if @stopped.value
         case item
           when StreamEvent
